@@ -15,10 +15,6 @@ BEGIN
     END IF;
     
     -- Insert the new correction
-    SELECT id
-        INTO project_id
-        FROM projects
-	WHERE name = project_name;
     INSERT INTO corrections(user_id, project_id, score)
         VALUE (user_id, project_id, score);
 END //
