@@ -1,53 +1,35 @@
--- creates a stored procedure ComputeAverageWeightedScoreForUsers that computes and store the average weighted score for all students.
+-- Creates a stored procedure ComputeAverageWeightedScoreForUsers that
+-- computes and store the average weighted score for all students.
 DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers;
-DELIMITER //
-
-CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
+DELIMITER $$
+CREATE PROCEDURE ComputeAverageWeightedScoreForUsers ()
 BEGIN
-    DECLARE user_id INT;
-    DECLARE total_weighted_score FLOAT;
-    DECLARE total_weight FLOAT;
-    DECLARE current_score FLOAT;
-    DECLARE current_weight INT;
+    ALTER TABLE users ADD total_weighted_score INT NOT NULL;
+    ALTER TABLE users ADD total_weight INT NOT NULL;
 
-    -- Declare a cursor to iterate through all users
-    DECLARE user_cursor CURSOR FOR SELECT id FROM users;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET @done = 1;
+    UPDATE users
+        SET total_weighted_score = (
+            SELECT SUM(corrections.score * projects.weight)
+            FROM corrections
+                INNER JOIN projects
+                    ON corrections.project_id = projects.id
+            WHERE corrections.user_id = users.id
+            );
 
-    -- Open the cursor
-    OPEN user_cursor;
+    UPDATE users
+        SET total_weight = (
+            SELECT SUM(projects.weight)
+                FROM corrections
+                    INNER JOIN projects
+                        ON corrections.project_id = projects.id
+                WHERE corrections.user_id = users.id
+            );
 
-    -- Loop through all users
-    user_loop: LOOP
-        FETCH user_cursor INTO user_id;
-        IF @done THEN
-            LEAVE user_loop;
-        END IF;
-
-        SET total_weighted_score = 0;
-        SET total_weight = 0;
-
-        -- Calculate the total weighted score and total weight for the current user
-        FOR c IN (SELECT score, weight FROM corrections WHERE user_id = user_id) DO
-            SET current_score = c.score;
-            SET current_weight = c.weight;
-            SET total_weighted_score = total_weighted_score + (current_score * current_weight);
-            SET total_weight = total_weight + current_weight;
-        END FOR;
-
-        -- Calculate the average weighted score for the current user
-        IF total_weight > 0 THEN
-            SET @average_weighted_score = total_weighted_score / total_weight;
-        ELSE
-            SET @average_weighted_score = 0;
-        END IF;
-
-        -- Update the user's average_score in the users table
-        UPDATE users SET average_score = @average_weighted_score WHERE id = user_id;
-    END LOOP;
-
-    -- Close the cursor
-    CLOSE user_cursor;
-END //
-
+    UPDATE users
+        SET users.average_score = IF(users.total_weight = 0, 0, users.total_weighted_score / users.total_weight);
+    ALTER TABLE users
+        DROP COLUMN total_weighted_score;
+    ALTER TABLE users
+        DROP COLUMN total_weight;
+END $$
 DELIMITER ;
