@@ -5,7 +5,7 @@ DELIMITER //
 
 CREATE PROCEDURE AddBonus (IN user_id INT, IN project_name VARCHAR(255), IN score INT)
 BEGIN
-    DECLARE project_id INT;
+    DECLARE project_id INT DEFAULT 0;
     SET project_id = (SELECT id FROM projects WHERE name = project_name);
 
     -- if project doesn't exist, create it
@@ -15,13 +15,12 @@ BEGIN
     END IF;
     
     -- Insert the new correction
-    INSERT INTO corrections (user_id, project_id, score)
-    VALUES (user_id, project_id, score);
-
-    -- Update the average score of the user
-    UPDATE users
-    SET average_score = (SELECT AVG(score) FROM corrections WHERE user_id = user_id)
-    WHERE id = user_id;
-
-    SELECT '--';
+    SELECT id
+        INTO project_id
+        FROM projects
+	WHERE name = project_name;
+    INSERT INTO corrections(user_id, project_id, score)
+        VALUE (user_id, project_id, score);
 END //
+
+DELIMITER ;
