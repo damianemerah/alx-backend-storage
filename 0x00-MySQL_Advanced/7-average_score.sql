@@ -1,7 +1,11 @@
 -- Creates a stored procedure ComputeAverageScoreForUser that
 -- computes and stores the average score for a student.
 DROP PROCEDURE IF EXISTS ComputeAverageScoreForUser;
+<<<<<<< HEAD
 DELIMITER $$
+=======
+DELIMITER //
+>>>>>>> origin/master
 CREATE PROCEDURE ComputeAverageScoreForUser (user_id INT)
 BEGIN
     DECLARE total_score INT DEFAULT 0;
@@ -19,5 +23,10 @@ BEGIN
     UPDATE users
         SET users.average_score = IF(projects_count = 0, 0, total_score / projects_count)
         WHERE users.id = user_id;
+<<<<<<< HEAD
 END $$
 DELIMITER ;
+=======
+END //
+DELIMITER ;
+>>>>>>> origin/master
