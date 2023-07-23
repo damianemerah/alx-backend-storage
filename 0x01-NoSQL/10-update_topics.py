@@ -7,6 +7,6 @@ based on the name:
 def update_topics(mongo_collection, name, topics):
     """updates topics in mongo_colloction"""
     mongo_collection.update_many({
-        {name: name},
+        {"name": name},
         {"$set": {"topics": topics}}
-        })
+    })

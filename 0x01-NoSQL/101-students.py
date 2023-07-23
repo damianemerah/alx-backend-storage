@@ -4,7 +4,7 @@
 
 def top_students(mongo_collection):
     """returns all students sorted by average score:"""
-    pipline = [{
+    pipeline = [{
         "$project": {
             "name": 1,
             "_id": 1,
