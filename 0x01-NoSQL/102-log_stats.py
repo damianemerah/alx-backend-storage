@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Task 15's module"""
+from pymongo import MongoClient
 
 
 def print_nginx_logs(nginx_collection):
@@ -9,10 +10,10 @@ def print_nginx_logs(nginx_collection):
     methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
     for method in methods:
-        req_count = len(list(nginx_collection.find({"methods": method})))
+        req_count = len(list(nginx_collection.find({"method": method})))
         print("\tmethod {}: {}".format(method, req_count))
     status_check_count = len(list(
-        nginx_collection.find({"methods": "GET", "path": "/status"})
+        nginx_collection.find({"method": "GET", "path": "/status"})
     ))
     print("{} status check".format(status_check_count))
 
@@ -20,7 +21,7 @@ def print_nginx_logs(nginx_collection):
 def print_top_ips(server_collection):
     """Prints stats for top 10 HTTP IPs in a collection"""
     print("IPs:")
-    reqest_logs = server_collection.aggregate([
+    request_logs = server_collection.aggregate([
         {
             "$group": {
                 "_id": "$ip",
@@ -40,8 +41,8 @@ def print_top_ips(server_collection):
 
 
 def run():
-    '''Provides some stats about Nginx logs stored in Mongodb'''
-    client = MongoClient('mongdb://127.0.0.1:27017')
+    '''Provides some stats about Nginx logs stored in MongoDB'''
+    client = MongoClient('mongodb://127.0.0.1:27017')
     print_nginx_logs(client.logs.nginx)
     print_top_ips(client.logs.nginx)
 
