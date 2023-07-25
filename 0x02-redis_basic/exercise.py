@@ -2,7 +2,7 @@
 '''Task 0's module'''
 import redis
 import uuid
-from typing import Union
+from typing import Union, Callable
 
 
 class Cache:
@@ -20,3 +20,23 @@ class Cache:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
+
+
+    def get(key: str, fn: Callable = None) -> Union[str, float, int, byte]:
+        '''converts the data back to desired format'''
+        data = self._redis.get(key)
+        if data is not None:
+            if fn is not None:
+                return fn(key)
+            return data
+        return None
+
+
+    def get_str(self, key: str) -> str:
+        '''Retrieves a string value from a Redis data storage'''
+        return self.get(key, fn=lambda d: d.decode('utf-8'))
+
+
+    def get_int(self, key: int) -> int:
+         '''Retrieves an int value from a Redis data storage'''
+         return self.get(key, fn= int(x))
