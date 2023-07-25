@@ -12,7 +12,7 @@ class Cache:
     def __init__(self) -> None:
         '''init method'''
         self._redis = redis.Redis()
-        self._redis.flushdb()
+        self._redis.flushdb(True)
 
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
@@ -25,11 +25,9 @@ class Cache:
     def get(key: str, fn: Callable = None) -> Union[str, float, int, byte]:
         '''converts the data back to desired format'''
         data = self._redis.get(key)
-        if data is not None:
-            if fn is not None:
-                return fn(key)
-            return data
-        return None
+        if fn is not None:
+            return fn(key)
+        return data
 
 
     def get_str(self, key: str) -> str:
