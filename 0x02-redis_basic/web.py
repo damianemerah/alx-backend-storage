@@ -5,13 +5,14 @@ import redis
 import requests
 from typing import Callable
 
+redis_ = redis.Redis()
+
 
 def request_count(method: Callable) -> Callable:
     '''decorator for counting'''
     @wraps(method)
     def invoker(url):
         '''decorator wrapper'''
-        redis_ = redis.Redis()
         redis_.incr(f"count:{url}")
         cached_url = redis_.get(url)
 
