@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 '''Task 5's module'''
+
+from functools import wraps
 import redis
 import requests
+from typing import Callable
 
 
-def request_count(method):
+def request_count(method: Callable) -> Callable:
     '''decorator for counting'''
     @wraps(method)
     def invoker(url):
