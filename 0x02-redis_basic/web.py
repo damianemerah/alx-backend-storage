@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 '''Task 5's module'''
-
 from functools import wraps
 import redis
 import requests
