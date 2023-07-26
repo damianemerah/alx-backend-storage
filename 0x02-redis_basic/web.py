@@ -22,6 +22,7 @@ def request_count(method):
     return invoker
 
 
+@request_count
 def get_page(url: str) -> str:
     '''obtain the HTML content of a particular URL'''
     req = requests.get(url)
