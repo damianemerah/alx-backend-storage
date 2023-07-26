@@ -20,7 +20,7 @@ def request_count(method: Callable) -> Callable:
             return cached_url.decode('utf-8')
 
         content = method(url)
-        redis_.setex(cached_url, 10, content)
+        redis_.setex(url, 10, content)
         return content
     return invoker
 
